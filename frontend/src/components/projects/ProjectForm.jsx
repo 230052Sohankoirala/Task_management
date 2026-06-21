@@ -6,7 +6,7 @@ import { DateInput, Input, Select, Textarea } from "../common/Form";
 
 export function ProjectForm({ project, onSaved }) {
   const { saveProject } = useContext(ProjectContext);
-  const [form, setForm] = useState(project || { name: "", key: "", description: "", leadId: "u2", memberIds: ["u2", "u4"], startDate: "2026-06-20", dueDate: "2026-08-01", status: "Planning", priority: "Medium", progress: 0, color: "#2563eb" });
+  const [form, setForm] = useState(project || { name: "", key: "", description: "", leadId: "u2", memberIds: ["u2", "u4"], startDate: "", dueDate: "", status: "Planning", priority: "Medium", progress: 0, color: "#2563eb" });
   const update = (key, value) => setForm((current) => ({ ...current, [key]: value }));
   return (
     <form className="form-grid" onSubmit={(event) => { event.preventDefault(); saveProject(form); onSaved?.(); }}>

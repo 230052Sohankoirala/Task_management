@@ -1,12 +1,11 @@
 import { createContext, useCallback, useMemo } from "react";
 import toast from "react-hot-toast";
-import { projects as seedProjects } from "../data/projects";
 import { useLocalStorage } from "../hooks/useLocalStorage";
 
 export const ProjectContext = createContext(null);
 
 export function ProjectProvider({ children }) {
-  const [projects, setProjects] = useLocalStorage("projects", seedProjects);
+  const [projects, setProjects] = useLocalStorage("taskmanagement.projects", []);
 
   const saveProject = useCallback((project) => {
     setProjects((current) => {

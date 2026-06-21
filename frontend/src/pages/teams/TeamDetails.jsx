@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Tabs } from "../../components/common/Tabs";
 import { EmptyState } from "../../components/common/State";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { TeamMemberCard } from "../../components/teams/TeamMemberCard";
-import { projects } from "../../data/projects";
+import { ProjectContext } from "../../contexts/ProjectContext";
 import { teams } from "../../data/teams";
 import { users } from "../../data/users";
 import { ProjectCard } from "../../components/projects/ProjectCard";
@@ -12,6 +12,7 @@ import { ProjectCard } from "../../components/projects/ProjectCard";
 export default function TeamDetails() {
   const { id } = useParams();
   const [active, setActive] = useState("Overview");
+  const { projects } = useContext(ProjectContext);
   const team = teams.find((item) => item.id === id);
   if (!team) return <EmptyState title="Team not found" />;
   const members = users.filter((user) => team.memberIds.includes(user.id));
