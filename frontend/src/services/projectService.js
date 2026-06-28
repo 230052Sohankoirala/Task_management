@@ -1,8 +1,36 @@
 import api from "../utils/api";
-import { withFallback } from "./mockService";
 
 export const projectService = {
-  list: () => withFallback(() => api.get("/projects"), []),
-  get: (id) => withFallback(() => api.get(`/projects/${id}`), null),
-  save: (payload) => withFallback(() => api.post("/projects", payload), payload),
+  list: async () => {
+    try {
+      const response = await api.get("/projects");
+      return response.data;
+    } catch {
+      return [];
+    }
+  },
+  get: async (id) => {
+    try {
+      const response = await api.get(`/projects/${id}`);
+      return response.data;
+    } catch {
+      return null;
+    }
+  },
+  save: async (payload) => {
+    try {
+      const response = await api.post("/projects", payload);
+      return response.data;
+    } catch {
+      return { ...payload, id: `p-${Date.now()}` };
+    }
+  },
+  update: async (id, payload) => {
+    try {
+      const response = await api.put(`/projects/${id}`, payload);
+      return response.data;
+    } catch {
+      return { ...payload, id };
+    }
+  },
 };

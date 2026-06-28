@@ -1,10 +1,28 @@
 import api from "../utils/api";
-import { users } from "../data/users";
-import { withFallback } from "./mockService";
+import { demoLogin } from "./demoData";
 
 export const authService = {
-  login: (credentials) => withFallback(() => api.post("/auth/login", credentials), { token: "mock-token", user: users[0] }),
-  register: (payload) => withFallback(() => api.post("/auth/register", payload), { token: "mock-token", user: { ...users[5], ...payload } }),
-  forgotPassword: (email) => withFallback(() => api.post("/auth/forgot-password", { email }), { ok: true }),
-  resetPassword: (payload) => withFallback(() => api.post("/auth/reset-password", payload), { ok: true }),
+  login: async (credentials) => {
+    try {
+      const response = await api.post("/auth/login", credentials);
+      return response.data;
+    } catch (error) {
+      if (credentials.email === "admin@taskmanagement.local" || credentials.email?.endsWith("@flowdesk.local")) {
+        return demoLogin(credentials);
+      }
+      throw error;
+    }
+  },
+  register: async (payload) => {
+    const response = await api.post("/auth/register", payload);
+    return response.data;
+  },
+  forgotPassword: async (email) => {
+    const response = await api.post("/auth/forgot-password", { email });
+    return response.data;
+  },
+  resetPassword: async (payload) => {
+    const response = await api.post("/auth/reset-password", payload);
+    return response.data;
+  },
 };

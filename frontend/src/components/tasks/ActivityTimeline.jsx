@@ -1,5 +1,8 @@
-import { activities } from "../../data/activities";
+import { useContext } from "react";
+import { ActivityContext } from "../../contexts/ActivityContext";
 
 export function ActivityTimeline() {
-  return <section className="timeline">{activities.slice(0, 6).map((item) => <article key={item.id}><strong>{item.action}</strong><span>{item.target}</span></article>)}</section>;
+  const { activities } = useContext(ActivityContext);
+
+  return <section className="timeline">{activities.slice(0, 6).map((item) => <article key={item.id}><strong>{item.action}</strong><span>{item.message}</span></article>)}</section>;
 }

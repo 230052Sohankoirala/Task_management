@@ -1,12 +1,12 @@
-import { useState } from "react";
-import toast from "react-hot-toast";
+import { useContext } from "react";
 import { Button } from "../../components/common/Button";
+import { EmptyState } from "../../components/common/State";
 import { PageHeader } from "../../components/layout/PageHeader";
 import { NotificationItem } from "../../components/notifications/NotificationItem";
-import { notifications as seedNotifications } from "../../data/notifications";
+import { NotificationContext } from "../../contexts/NotificationContext";
 
 export default function Notifications() {
-  const [notifications, setNotifications] = useState(seedNotifications);
-  const markAll = () => { setNotifications((current) => current.map((item) => ({ ...item, read: true }))); toast.success("All notifications marked read"); };
-  return <><PageHeader title="Notifications" description={`${notifications.filter((item) => !item.read).length} unread updates`} action={<Button onClick={markAll}>Mark all as read</Button>} /><div className="stack">{notifications.map((notification) => <NotificationItem key={notification.id} notification={notification} onRead={() => setNotifications((current) => current.map((item) => item.id === notification.id ? { ...item, read: true } : item))} onDelete={() => setNotifications((current) => current.filter((item) => item.id !== notification.id))} />)}</div></>;
+  const { notifications, unread, markAllRead, markRead, deleteNotification } = useContext(NotificationContext);
+
+  return <><PageHeader title="Notifications" description={`${unread} unread updates`} action={<Button onClick={markAllRead} disabled={!notifications.length}>Mark all as read</Button>} />{notifications.length ? <div className="stack">{notifications.map((notification) => <NotificationItem key={notification.id} notification={notification} onRead={() => markRead(notification.id)} onDelete={() => deleteNotification(notification.id)} />)}</div> : <EmptyState title="No notifications" description="Alerts and approval updates will appear here." />}</>;
 }

@@ -1,8 +1,19 @@
 import api from "../utils/api";
-import { users } from "../data/users";
-import { withFallback } from "./mockService";
-
 export const userService = {
-  list: () => withFallback(() => api.get("/users"), users),
-  update: (id, payload) => withFallback(() => api.put(`/users/${id}`, payload), { ...payload, id }),
+  list: async () => {
+    try {
+      const response = await api.get("/users");
+      return response.data;
+    } catch {
+      return [];
+    }
+  },
+  update: async (id, payload) => {
+    try {
+      const response = await api.put(`/users/${id}`, payload);
+      return response.data;
+    } catch {
+      return { ...payload, id };
+    }
+  },
 };

@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useContext, useState } from "react";
 import { Bell, Check, LogOut, Menu, Moon, Plus, Search, Sun, User } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { IconButton } from "../common/IconButton";
@@ -7,15 +7,15 @@ import { Dropdown } from "../common/Dropdown";
 import { Avatar } from "../common/Avatar";
 import { useAuth } from "../../hooks/useAuth";
 import { useTheme } from "../../hooks/useTheme";
-import { notifications as seedNotifications } from "../../data/notifications";
+import { NotificationContext } from "../../contexts/NotificationContext";
 
 export function Navbar({ onMenu, onCollapse }) {
   const { user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { notifications, unread } = useContext(NotificationContext);
   const navigate = useNavigate();
   const [noticeOpen, setNoticeOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const unread = useMemo(() => seedNotifications.filter((item) => !item.read).length, []);
 
   return (
     <header className="navbar">
@@ -37,9 +37,10 @@ export function Navbar({ onMenu, onCollapse }) {
           </button>
           <Dropdown open={noticeOpen}>
             <div className="dropdown-head">Notifications</div>
-            {seedNotifications.slice(0, 5).map((notice) => (
+            {notifications.slice(0, 5).map((notice) => (
               <Link key={notice.id} to="/notifications" className="dropdown-row"><Check size={14} />{notice.message}</Link>
             ))}
+            {!notifications.length ? <span className="dropdown-row">No notifications</span> : null}
           </Dropdown>
         </div>
         <div className="relative">

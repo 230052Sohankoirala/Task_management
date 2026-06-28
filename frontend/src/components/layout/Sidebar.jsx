@@ -19,39 +19,30 @@ const mainLinks = [
 ];
 
 const adminLinks = [
-  ["/admin", Shield, "Admin Dashboard"],
-  ["/admin/users", UserCog, "Users"],
-  ["/admin/projects", FolderKanban, "All Projects"],
-  ["/workspace-settings", Settings, "Workspace Settings"],
-  ["/analytics", BarChart3, "Analytics"],
+  ["/admin", Shield, "Overview"],
+  ["/admin/users", UserCog, "Access & Roles"],
+  ["/admin/projects", FolderKanban, "Projects"],
+  ["/reports", BarChart3, "Reports"],
+  ["/activity", Activity, "Audit Log"],
+  ["/workspace-settings", Settings, "Workspace"],
 ];
 
 export function Sidebar({ collapsed, mobileOpen, onClose }) {
   const { user } = useAuth();
+  const links = user?.role === ROLES.ADMIN ? adminLinks : mainLinks;
+
   return (
     <aside className={clsx("sidebar", collapsed && "collapsed", mobileOpen && "mobile-open")}>
-      <div className="brand"><span>F</span><strong>FlowDesk</strong></div>
+      <div className="brand"><span>TM</span><strong>TaskPilot</strong></div>
+      {user?.role === ROLES.ADMIN ? <div className="sidebar-section admin-primary"><small>Admin</small></div> : null}
       <nav>
-        {mainLinks.map(([to, Icon, label]) => (
+        {links.map(([to, Icon, label]) => (
           <NavLink key={to} to={to} end={to === "/"} onClick={onClose}>
             <Icon size={18} />
             <span>{label}</span>
           </NavLink>
         ))}
       </nav>
-      {user?.role === ROLES.ADMIN ? (
-        <div className="sidebar-section">
-          <small>Admin</small>
-          <nav>
-            {adminLinks.map(([to, Icon, label]) => (
-              <NavLink key={to} to={to} end={to === "/admin"} onClick={onClose}>
-                <Icon size={18} />
-                <span>{label}</span>
-              </NavLink>
-            ))}
-          </nav>
-        </div>
-      ) : null}
     </aside>
   );
 }

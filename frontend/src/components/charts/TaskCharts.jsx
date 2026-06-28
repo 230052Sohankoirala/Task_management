@@ -12,7 +12,11 @@ export function PriorityBar({ tasks }) {
   return <ResponsiveContainer height={240}><BarChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Bar dataKey="value" fill="#2563eb" radius={[6, 6, 0, 0]} /></BarChart></ResponsiveContainer>;
 }
 
-export function ProgressLine() {
-  const data = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((name, index) => ({ name, progress: 35 + index * 9 }));
+export function ProgressLine({ tasks = [] }) {
+  const data = tasks.slice(0, 6).map((task, index) => ({
+    name: task.key || `Task ${index + 1}`,
+    progress: task.status === "Done" ? 100 : task.status === "In Review" ? 75 : task.status === "In Progress" ? 50 : task.status === "To Do" ? 25 : 0,
+  }));
+
   return <ResponsiveContainer height={240}><LineChart data={data}><CartesianGrid strokeDasharray="3 3" /><XAxis dataKey="name" /><YAxis /><Tooltip /><Line type="monotone" dataKey="progress" stroke="#7c3aed" strokeWidth={3} /></LineChart></ResponsiveContainer>;
 }

@@ -1,8 +1,20 @@
 import api from "../utils/api";
-import { notifications } from "../data/notifications";
-import { withFallback } from "./mockService";
 
 export const notificationService = {
-  list: () => withFallback(() => api.get("/notifications"), notifications),
-  markAllRead: () => withFallback(() => api.post("/notifications/read-all"), { ok: true }),
+  list: async () => {
+    try {
+      const response = await api.get("/notifications");
+      return response.data;
+    } catch {
+      return [];
+    }
+  },
+  markAllRead: async () => {
+    try {
+      const response = await api.post("/notifications/read-all");
+      return response.data;
+    } catch {
+      return { ok: true };
+    }
+  },
 };

@@ -4,9 +4,10 @@ export default function AuthLayout() {
   return (
     <main className="auth-layout">
       <section className="auth-visual">
-        <span>FlowDesk</span>
-        <h1>Plan work, move faster, stay aligned.</h1>
-        <p>A frontend-only project workspace with realistic data, charts, board movement, and local persistence.</p>
+        <span>TaskPilot</span>
+        <h1>One workspace for focused delivery.</h1>
+        <p>Manage projects, sprint work, assignments, reporting, approvals, and deadlines from a clear operational dashboard.</p>
+        
       </section>
       <section className="auth-panel">
         <Outlet />

@@ -1,25 +1,68 @@
-import { createContext, useCallback, useMemo } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo } from "react";
 import toast from "react-hot-toast";
+import { AuthContext } from "./AuthContext";
 import { useLocalStorage } from "../hooks/useLocalStorage";
+import { taskService } from "../services/taskService";
 
 export const TaskContext = createContext(null);
 
 export function TaskProvider({ children }) {
+  const { user } = useContext(AuthContext);
   const [tasks, setTasks] = useLocalStorage("taskmanagement.tasks", []);
   const [sprints, setSprints] = useLocalStorage("taskmanagement.sprints", []);
 
-  const saveTask = useCallback((task) => {
+  useEffect(() => {
+    let mounted = true;
+
+    if (!user) {
+      setTasks([]);
+      return () => {
+        mounted = false;
+      };
+    }
+
+    taskService.list()
+      .then((data) => {
+        if (mounted && Array.isArray(data)) setTasks(data);
+      })
+      .catch((error) => toast.error(error.response?.data?.message || "Could not load tasks"));
+
+    return () => {
+      mounted = false;
+    };
+  }, [setTasks, user]);
+
+  const saveTask = useCallback(async (task) => {
+    let saved;
+
+    try {
+      saved = task.id ? await taskService.update(task.id, task) : await taskService.save(task);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Could not save task");
+      throw error;
+    }
+
     setTasks((current) => {
-      const exists = current.some((item) => item.id === task.id);
-      return exists ? current.map((item) => (item.id === task.id ? task : item)) : [{ ...task, id: `t${Date.now()}`, key: task.key || `NEW-${current.length + 1}` }, ...current];
+      const nextTask = saved?.id ? saved : { ...task, id: task.id || `t${Date.now()}`, key: task.key || `NEW-${current.length + 1}` };
+      const exists = current.some((item) => item.id === nextTask.id);
+      return exists ? current.map((item) => (item.id === nextTask.id ? nextTask : item)) : [nextTask, ...current];
     });
     toast.success("Task saved");
+    return saved;
   }, [setTasks]);
 
-  const updateTaskStatus = useCallback((taskId, status) => {
+  const updateTaskStatus = useCallback(async (taskId, status) => {
+    const previousTasks = tasks;
     setTasks((current) => current.map((task) => (task.id === taskId ? { ...task, status } : task)));
-    toast.success(`Moved to ${status}`);
-  }, [setTasks]);
+
+    try {
+      await taskService.move(taskId, status);
+      toast.success(`Moved to ${status}`);
+    } catch (error) {
+      setTasks(previousTasks);
+      toast.error(error.response?.data?.message || "Could not update task status");
+    }
+  }, [setTasks, tasks]);
 
   const createSprint = useCallback(() => {
     setSprints((current) => {
